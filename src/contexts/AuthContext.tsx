@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 interface AuthContextType {
   accessToken: string | null;
@@ -20,70 +20,40 @@ export const useAuth = () => {
   return context;
 };
 
+// Mock user data
+const mockUser = {
+  id: 'mock_user_123',
+  display_name: 'Demo User',
+  email: 'demo@soundflow.com',
+  followers: { total: 42 },
+  images: [
+    {
+      url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=150&h=150&fit=crop&crop=face'
+    }
+  ]
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [user, setUser] = useState<any | null>(null);
+  const [accessToken] = useState<string>('mock_access_token');
+  const [user] = useState<any>(mockUser);
 
   const setTokenFromUrl = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('access_token');
-    
-    if (token) {
-      setAccessToken(token);
-      localStorage.setItem('spotify_access_token', token);
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
+    // Mock implementation - no actual URL parsing needed
+    console.log('Mock: Token set from URL');
   };
 
   const login = () => {
-    window.location.href = 'http://localhost:4000/login';
+    console.log('Mock: Login initiated');
   };
 
   const logout = () => {
-    setAccessToken(null);
-    setUser(null);
-    localStorage.removeItem('spotify_access_token');
+    console.log('Mock: User logged out');
   };
-
-  useEffect(() => {
-    // Check for token in URL first
-    setTokenFromUrl();
-    
-    // Then check localStorage
-    const storedToken = localStorage.getItem('spotify_access_token');
-    if (storedToken && !accessToken) {
-      setAccessToken(storedToken);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (accessToken) {
-      // Fetch user profile
-      fetch('https://api.spotify.com/v1/me', {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          console.error('Token invalid:', data.error);
-          logout();
-        } else {
-          setUser(data);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching user:', error);
-      });
-    }
-  }, [accessToken]);
 
   const value = {
     accessToken,
     user,
-    isAuthenticated: !!accessToken,
+    isAuthenticated: true, // Always authenticated with mock data
     login,
     logout,
     setTokenFromUrl

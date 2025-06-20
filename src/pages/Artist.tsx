@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,10 +5,11 @@ import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Play, MoreHorizontal } from 'lucide-react';
+import { mockArtists, mockTopTracks, mockAlbums } from '@/data/mockData';
 
 const Artist = () => {
   const { id } = useParams();
-  const { isAuthenticated, accessToken } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [artist, setArtist] = useState<any>(null);
   const [topTracks, setTopTracks] = useState<any[]>([]);
@@ -17,62 +17,30 @@ const Artist = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchArtistData = async () => {
-      if (!accessToken || !id) return;
-
-      try {
-        const headers = {
-          'Authorization': `Bearer ${accessToken}`,
-        };
-
-        // Fetch artist info
-        const artistResponse = await fetch(
-          `https://api.spotify.com/v1/artists/${id}`,
-          { headers }
-        );
-        const artistData = await artistResponse.json();
-
-        // Fetch top tracks
-        const topTracksResponse = await fetch(
-          `https://api.spotify.com/v1/artists/${id}/top-tracks?market=US`,
-          { headers }
-        );
-        const topTracksData = await topTracksResponse.json();
-
-        // Fetch albums
-        const albumsResponse = await fetch(
-          `https://api.spotify.com/v1/artists/${id}/albums?include_groups=album,single&market=US&limit=20`,
-          { headers }
-        );
-        const albumsData = await albumsResponse.json();
-
-        setArtist(artistData);
-        setTopTracks(topTracksData.tracks || []);
-        setAlbums(albumsData.items || []);
+    const fetchArtistData = () => {
+      // Simulate API call delay
+      setTimeout(() => {
+        const mockArtist = mockArtists[id as keyof typeof mockArtists] || mockArtists.artist1;
+        const artistTopTracks = mockTopTracks[id as keyof typeof mockTopTracks] || mockTopTracks.artist1;
+        const artistAlbums = mockAlbums[id as keyof typeof mockAlbums] || mockAlbums.artist1;
+        
+        setArtist(mockArtist);
+        setTopTracks(artistTopTracks);
+        setAlbums(artistAlbums);
         setLoading(false);
-      } catch (error) {
-        console.error('Error fetching artist data:', error);
-        setLoading(false);
-      }
+        
+        console.log('Loaded artist:', mockArtist.name);
+      }, 800);
     };
 
     fetchArtistData();
-  }, [id, accessToken, isAuthenticated, navigate]);
+  }, [id]);
 
   const formatDuration = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   if (loading) {
     return (
@@ -135,6 +103,7 @@ const Artist = () => {
             <Button
               size="icon"
               className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full"
+              onClick={() => console.log('Playing artist:', artist.name)}
             >
               <Play className="h-6 w-6 fill-current ml-1" />
             </Button>
@@ -152,6 +121,7 @@ const Artist = () => {
                   <div
                     key={track.id}
                     className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-800/50 transition-colors group cursor-pointer"
+                    onClick={() => console.log('Playing track:', track.name)}
                   >
                     <span className="text-gray-400 w-6 text-center group-hover:hidden">
                       {index + 1}
@@ -160,11 +130,15 @@ const Artist = () => {
                       size="icon"
                       variant="ghost"
                       className="hidden group-hover:flex h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Playing track:', track.name);
+                      }}
                     >
                       <Play className="h-4 w-4 fill-current" />
                     </Button>
                     <img
-                      src={track.album.images?.[2]?.url || '/placeholder.svg'}
+                      src={track.album.images?.[0]?.url || '/placeholder.svg'}
                       alt={track.name}
                       className="w-12 h-12 rounded"
                     />
@@ -197,6 +171,7 @@ const Artist = () => {
                   <Card
                     key={album.id}
                     className="bg-gray-800/50 border-gray-700 hover:bg-gray-700/50 transition-all duration-200 cursor-pointer group"
+                    onClick={() => console.log('Viewing album:', album.name)}
                   >
                     <CardContent className="p-4">
                       <div className="relative mb-4">
@@ -208,6 +183,10 @@ const Artist = () => {
                         <Button
                           size="icon"
                           className="absolute bottom-2 right-2 bg-green-500 hover:bg-green-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Playing album:', album.name);
+                          }}
                         >
                           <Play className="h-4 w-4 fill-current" />
                         </Button>

@@ -1,49 +1,33 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Play, Clock, MoreHorizontal } from 'lucide-react';
+import { mockPlaylists } from '@/data/mockData';
 
 const Playlist = () => {
   const { id } = useParams();
-  const { isAuthenticated, accessToken } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [playlist, setPlaylist] = useState<any>(null);
   const [tracks, setTracks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchPlaylist = async () => {
-      if (!accessToken || !id) return;
-
-      try {
-        const response = await fetch(
-          `https://api.spotify.com/v1/playlists/${id}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-            },
-          }
-        );
-        const data = await response.json();
-        setPlaylist(data);
-        setTracks(data.tracks?.items || []);
+    const fetchPlaylist = () => {
+      // Simulate API call delay
+      setTimeout(() => {
+        const mockPlaylist = mockPlaylists[id as keyof typeof mockPlaylists] || mockPlaylists.playlist1;
+        setPlaylist(mockPlaylist);
+        setTracks(mockPlaylist.tracks?.items || []);
         setLoading(false);
-      } catch (error) {
-        console.error('Error fetching playlist:', error);
-        setLoading(false);
-      }
+        console.log('Loaded playlist:', mockPlaylist.name);
+      }, 800);
     };
 
     fetchPlaylist();
-  }, [id, accessToken, isAuthenticated, navigate]);
+  }, [id]);
 
   const formatDuration = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
@@ -124,6 +108,7 @@ const Playlist = () => {
             <Button
               size="icon"
               className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full"
+              onClick={() => console.log('Playing playlist:', playlist.name)}
             >
               <Play className="h-6 w-6 fill-current ml-1" />
             </Button>
@@ -154,6 +139,7 @@ const Playlist = () => {
                 <div
                   key={track.id || index}
                   className="grid grid-cols-12 gap-4 px-4 py-2 rounded-lg hover:bg-gray-800/50 transition-colors group cursor-pointer"
+                  onClick={() => console.log('Playing track:', track.name)}
                 >
                   <div className="col-span-1 flex items-center">
                     <span className="text-gray-400 group-hover:hidden">
@@ -163,6 +149,10 @@ const Playlist = () => {
                       size="icon"
                       variant="ghost"
                       className="hidden group-hover:flex h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Playing track:', track.name);
+                      }}
                     >
                       <Play className="h-4 w-4 fill-current" />
                     </Button>
@@ -170,7 +160,7 @@ const Playlist = () => {
 
                   <div className="col-span-6 flex items-center space-x-3">
                     <img
-                      src={track.album?.images?.[2]?.url || '/placeholder.svg'}
+                      src={track.album?.images?.[0]?.url || '/placeholder.svg'}
                       alt={track.name}
                       className="w-10 h-10 rounded"
                     />

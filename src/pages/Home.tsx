@@ -7,8 +7,132 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Clock } from 'lucide-react';
 
+// Mock data
+const mockFeaturedPlaylists = [
+  {
+    id: 'playlist1',
+    name: 'Today\'s Top Hits',
+    description: 'The most played songs right now',
+    images: [{ url: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'playlist2',
+    name: 'Chill Vibes',
+    description: 'Relax and unwind with these smooth tracks',
+    images: [{ url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'playlist3',
+    name: 'Rock Classics',
+    description: 'Legendary rock anthems that never get old',
+    images: [{ url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'playlist4',
+    name: 'Electronic Dreams',
+    description: 'Futuristic beats and electronic masterpieces',
+    images: [{ url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'playlist5',
+    name: 'Jazz & Blues',
+    description: 'Smooth jazz and soulful blues selections',
+    images: [{ url: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'playlist6',
+    name: 'Workout Pump',
+    description: 'High-energy tracks to fuel your workout',
+    images: [{ url: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=300&h=300&fit=crop' }]
+  }
+];
+
+const mockNewReleases = [
+  {
+    id: 'album1',
+    name: 'Midnight Reflections',
+    artists: [{ name: 'Luna Martinez', id: 'artist1' }],
+    images: [{ url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&h=300&fit=crop' }],
+    release_date: '2024-01-15'
+  },
+  {
+    id: 'album2',
+    name: 'Electric Nights',
+    artists: [{ name: 'Neon Pulse', id: 'artist2' }],
+    images: [{ url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&h=300&fit=crop' }],
+    release_date: '2024-01-12'
+  },
+  {
+    id: 'album3',
+    name: 'Urban Stories',
+    artists: [{ name: 'City Beats', id: 'artist3' }],
+    images: [{ url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=300&h=300&fit=crop' }],
+    release_date: '2024-01-10'
+  },
+  {
+    id: 'album4',
+    name: 'Acoustic Sessions',
+    artists: [{ name: 'River Stone', id: 'artist4' }],
+    images: [{ url: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=300&h=300&fit=crop' }],
+    release_date: '2024-01-08'
+  },
+  {
+    id: 'album5',
+    name: 'Synthwave Dreams',
+    artists: [{ name: 'Retro Future', id: 'artist5' }],
+    images: [{ url: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=300&h=300&fit=crop' }],
+    release_date: '2024-01-05'
+  },
+  {
+    id: 'album6',
+    name: 'Soul Revival',
+    artists: [{ name: 'Maya Johnson', id: 'artist6' }],
+    images: [{ url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&h=300&fit=crop' }],
+    release_date: '2024-01-03'
+  }
+];
+
+const mockUserPlaylists = [
+  {
+    id: 'user_playlist1',
+    name: 'My Favorites',
+    description: 'Songs I love and play on repeat',
+    images: [{ url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'user_playlist2',
+    name: 'Discover Weekly',
+    description: 'Your weekly music discovery mix',
+    images: [{ url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'user_playlist3',
+    name: 'Road Trip Mix',
+    description: 'Perfect songs for long drives',
+    images: [{ url: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'user_playlist4',
+    name: 'Focus & Study',
+    description: 'Concentration music for productivity',
+    images: [{ url: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'user_playlist5',
+    name: 'Party Hits',
+    description: 'Get the party started with these bangers',
+    images: [{ url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&h=300&fit=crop' }]
+  },
+  {
+    id: 'user_playlist6',
+    name: 'Late Night Vibes',
+    description: 'Smooth tracks for evening relaxation',
+    images: [{ url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&h=300&fit=crop' }]
+  }
+];
+
 const Home = () => {
-  const { isAuthenticated, accessToken, setTokenFromUrl } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [featuredPlaylists, setFeaturedPlaylists] = useState<any[]>([]);
   const [newReleases, setNewReleases] = useState<any[]>([]);
@@ -16,61 +140,18 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTokenFromUrl();
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
-    const fetchData = async () => {
-      if (!accessToken) return;
-
-      try {
-        const headers = {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        };
-
-        // Fetch featured playlists
-        const featuredResponse = await fetch(
-          'https://api.spotify.com/v1/browse/featured-playlists?limit=6',
-          { headers }
-        );
-        const featuredData = await featuredResponse.json();
-
-        // Fetch new releases
-        const releasesResponse = await fetch(
-          'https://api.spotify.com/v1/browse/new-releases?limit=6',
-          { headers }
-        );
-        const releasesData = await releasesResponse.json();
-
-        // Fetch user playlists
-        const userPlaylistsResponse = await fetch(
-          'https://api.spotify.com/v1/me/playlists?limit=6',
-          { headers }
-        );
-        const userPlaylistsData = await userPlaylistsResponse.json();
-
-        setFeaturedPlaylists(featuredData.playlists?.items || []);
-        setNewReleases(releasesData.albums?.items || []);
-        setUserPlaylists(userPlaylistsData.items || []);
+    // Simulate loading time for realistic experience
+    const loadMockData = () => {
+      setTimeout(() => {
+        setFeaturedPlaylists(mockFeaturedPlaylists);
+        setNewReleases(mockNewReleases);
+        setUserPlaylists(mockUserPlaylists);
         setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      }
+      }, 1000);
     };
 
-    fetchData();
-  }, [isAuthenticated, accessToken, navigate]);
-
-  if (!isAuthenticated) {
-    return null;
-  }
+    loadMockData();
+  }, []);
 
   if (loading) {
     return (
@@ -114,13 +195,17 @@ const Home = () => {
           <Button
             size="icon"
             className="absolute bottom-2 right-2 bg-green-500 hover:bg-green-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log('Playing playlist:', playlist.name);
+            }}
           >
             <Play className="h-4 w-4 fill-current" />
           </Button>
         </div>
         <h3 className="font-semibold text-white truncate mb-1">{playlist.name}</h3>
         <p className="text-sm text-gray-400 truncate">
-          {playlist.description || playlist.artists?.[0]?.name || 'Spotify'}
+          {playlist.description || playlist.artists?.[0]?.name || 'SoundFlow'}
         </p>
       </CardContent>
     </Card>
@@ -138,67 +223,70 @@ const Home = () => {
         </div>
 
         {/* Featured Playlists */}
-        {featuredPlaylists.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">Featured Playlists</h2>
-              <Button variant="ghost" className="text-gray-400 hover:text-white">
-                Show all
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredPlaylists.map((playlist) => (
-                <PlaylistCard
-                  key={playlist.id}
-                  playlist={playlist}
-                  onClick={() => navigate(`/playlist/${playlist.id}`)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Featured Playlists</h2>
+            <Button variant="ghost" className="text-gray-400 hover:text-white">
+              Show all
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredPlaylists.map((playlist) => (
+              <PlaylistCard
+                key={playlist.id}
+                playlist={playlist}
+                onClick={() => {
+                  console.log('Navigating to playlist:', playlist.name);
+                  navigate(`/playlist/${playlist.id}`);
+                }}
+              />
+            ))}
+          </div>
+        </section>
 
         {/* New Releases */}
-        {newReleases.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">New Releases</h2>
-              <Button variant="ghost" className="text-gray-400 hover:text-white">
-                Show all
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {newReleases.map((album) => (
-                <PlaylistCard
-                  key={album.id}
-                  playlist={album}
-                  onClick={() => navigate(`/artist/${album.artists[0].id}`)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">New Releases</h2>
+            <Button variant="ghost" className="text-gray-400 hover:text-white">
+              Show all
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {newReleases.map((album) => (
+              <PlaylistCard
+                key={album.id}
+                playlist={album}
+                onClick={() => {
+                  console.log('Navigating to artist:', album.artists[0].name);
+                  navigate(`/artist/${album.artists[0].id}`);
+                }}
+              />
+            ))}
+          </div>
+        </section>
 
         {/* Your Playlists */}
-        {userPlaylists.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">Made for You</h2>
-              <Button variant="ghost" className="text-gray-400 hover:text-white">
-                Show all
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {userPlaylists.map((playlist) => (
-                <PlaylistCard
-                  key={playlist.id}
-                  playlist={playlist}
-                  onClick={() => navigate(`/playlist/${playlist.id}`)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">Made for You</h2>
+            <Button variant="ghost" className="text-gray-400 hover:text-white">
+              Show all
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {userPlaylists.map((playlist) => (
+              <PlaylistCard
+                key={playlist.id}
+                playlist={playlist}
+                onClick={() => {
+                  console.log('Navigating to user playlist:', playlist.name);
+                  navigate(`/playlist/${playlist.id}`);
+                }}
+              />
+            ))}
+          </div>
+        </section>
       </div>
     </Layout>
   );

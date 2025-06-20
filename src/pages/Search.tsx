@@ -9,9 +9,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search as SearchIcon, Play, Clock } from 'lucide-react';
 import { useDebounce } from '@/hooks/useDebounce';
+import { mockSearchResults } from '@/data/mockData';
 
 const Search = () => {
-  const { isAuthenticated, accessToken } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any>({});
@@ -19,37 +20,22 @@ const Search = () => {
   const debouncedQuery = useDebounce(query, 500);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (debouncedQuery && accessToken) {
-      searchSpotify(debouncedQuery);
+    if (debouncedQuery) {
+      searchMusic(debouncedQuery);
     } else {
       setResults({});
     }
-  }, [debouncedQuery, accessToken]);
+  }, [debouncedQuery]);
 
-  const searchSpotify = async (searchQuery: string) => {
+  const searchMusic = async (searchQuery: string) => {
     setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=track,artist,album,playlist&limit=20`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        }
-      );
-      const data = await response.json();
-      setResults(data);
-    } catch (error) {
-      console.error('Search error:', error);
-    } finally {
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      console.log('Searching for:', searchQuery);
+      setResults(mockSearchResults);
       setLoading(false);
-    }
+    }, 600);
   };
 
   const formatDuration = (ms: number) => {
@@ -57,10 +43,6 @@ const Search = () => {
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
-
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <Layout>
@@ -108,16 +90,21 @@ const Search = () => {
                     <div
                       key={track.id}
                       className="flex items-center space-x-4 p-4 rounded-lg hover:bg-gray-800 transition-colors group cursor-pointer"
+                      onClick={() => console.log('Playing search track:', track.name)}
                     >
                       <Button
                         size="icon"
                         variant="ghost"
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('Playing track:', track.name);
+                        }}
                       >
                         <Play className="h-4 w-4 fill-current" />
                       </Button>
                       <img
-                        src={track.album.images?.[2]?.url || '/placeholder.svg'}
+                        src={track.album.images?.[0]?.url || '/placeholder.svg'}
                         alt={track.name}
                         className="w-12 h-12 rounded"
                       />
@@ -143,7 +130,10 @@ const Search = () => {
                   <Card
                     key={artist.id}
                     className="bg-gray-800/50 border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/artist/${artist.id}`)}
+                    onClick={() => {
+                      console.log('Navigating to search artist:', artist.name);
+                      navigate(`/artist/${artist.id}`);
+                    }}
                   >
                     <CardContent className="p-4 text-center">
                       <img
@@ -165,6 +155,7 @@ const Search = () => {
                   <Card
                     key={album.id}
                     className="bg-gray-800/50 border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
+                    onClick={() => console.log('Viewing search album:', album.name)}
                   >
                     <CardContent className="p-4">
                       <img
@@ -188,7 +179,10 @@ const Search = () => {
                   <Card
                     key={playlist.id}
                     className="bg-gray-800/50 border-gray-700 hover:bg-gray-700/50 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/playlist/${playlist.id}`)}
+                    onClick={() => {
+                      console.log('Navigating to search playlist:', playlist.name);
+                      navigate(`/playlist/${playlist.id}`);
+                    }}
                   >
                     <CardContent className="p-4">
                       <img
@@ -214,6 +208,15 @@ const Search = () => {
             <SearchIcon className="h-16 w-16 text-gray-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No results found</h3>
             <p className="text-gray-400">Try searching with different keywords</p>
+          </div>
+        )}
+
+        {/* Default state when no search */}
+        {!query && (
+          <div className="text-center py-12">
+            <SearchIcon className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">Start searching</h3>
+            <p className="text-gray-400">Find your favorite songs, artists, albums, and playlists</p>
           </div>
         )}
       </div>
